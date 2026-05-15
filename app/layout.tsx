@@ -3,7 +3,7 @@ import Script from 'next/script';
 import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://sciencedrivenperformance.com'),
+  metadataBase: new URL('https://sdp.sciencedrivenperformance.in'),
   title: {
     default: 'Science Driven Performance',
     template: '%s',
@@ -29,6 +29,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           src="https://checkout.razorpay.com/v1/checkout.js"
           strategy="lazyOnload"
         />
+        {process.env.NODE_ENV === 'production' && (
+          <>
+            <Script
+              src="https://www.googletagmanager.com/gtag/js?id=G-7Y0J49L948"
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-7Y0J49L948');`}
+            </Script>
+            <Script id="clarity-init" strategy="lazyOnload">
+              {`(function(c,l,a,r,i,t,y){
+c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window, document, "clarity", "script", "wqyilnbaha");`}
+            </Script>
+          </>
+        )}
       </body>
     </html>
   );
