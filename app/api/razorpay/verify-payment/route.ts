@@ -24,7 +24,7 @@ async function sendMetaCapiEvent(params: {
     : undefined;
 
   const event = {
-    event_name: 'Purchase',
+    event_name: 'SDPPurchase',
     event_time: Math.floor(Date.now() / 1000),
     event_id: params.paymentId,
     action_source: 'website',
