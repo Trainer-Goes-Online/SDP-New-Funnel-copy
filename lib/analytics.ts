@@ -22,7 +22,10 @@ export function setMetaAdvancedMatching(data: MAMInput): void {
 
   if (data.email) {
     const em = data.email.trim().toLowerCase();
-    if (em) out.em = em;
+    if (em) {
+      out.em = em;
+      out.external_id = em;
+    }
   }
   if (data.phone) {
     const ph = data.phone.replace(/\D/g, '');

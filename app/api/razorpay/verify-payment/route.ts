@@ -27,6 +27,8 @@ async function sendMetaCapiEvent(params: {
   const normCt      = params.city.trim().toLowerCase().replace(/[^a-z]/g, '');
   const normCountry = params.country.trim().toLowerCase();
 
+  const emailHash = normEmail ? sha256(normEmail) : undefined;
+
   const event = {
     event_name: 'SDPPurchase',
     event_time: Math.floor(Date.now() / 1000),
@@ -34,12 +36,13 @@ async function sendMetaCapiEvent(params: {
     action_source: 'website',
     event_source_url: params.eventSourceUrl,
     user_data: {
-      ...(normEmail   && { em:      [sha256(normEmail)] }),
-      ...(normPhone   && { ph:      [sha256(normPhone)] }),
-      ...(normFn      && { fn:      [sha256(normFn)] }),
-      ...(normLn      && { ln:      [sha256(normLn)] }),
-      ...(normCt      && { ct:      [sha256(normCt)] }),
-      ...(normCountry && { country: [sha256(normCountry)] }),
+      ...(emailHash   && { em:          [emailHash] }),
+      ...(emailHash   && { external_id: [emailHash] }),
+      ...(normPhone   && { ph:          [sha256(normPhone)] }),
+      ...(normFn      && { fn:          [sha256(normFn)] }),
+      ...(normLn      && { ln:          [sha256(normLn)] }),
+      ...(normCt      && { ct:          [sha256(normCt)] }),
+      ...(normCountry && { country:     [sha256(normCountry)] }),
       ...(params.fbc             && { fbc: params.fbc }),
       ...(params.fbp             && { fbp: params.fbp }),
       ...(params.clientUserAgent && { client_user_agent: params.clientUserAgent }),
