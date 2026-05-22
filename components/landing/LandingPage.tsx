@@ -175,7 +175,7 @@ function SiteHeader() {
    ============================================================ */
 
 const HERO_MARKERS = ['HbA1c', 'Triglycerides', 'Blood Pressure', 'LDL Cholesterol'];
-const VSL_THUMB = '/vimeo-thumbs/1190060331.webp';
+const VSL_THUMB = '/vimeo-thumbs/1184772764.jpg';
 const VSL_URL = 'https://player.vimeo.com/video/1184772764';
 
 function VSLVideo() {
@@ -191,7 +191,7 @@ function VSLVideo() {
     if (!playing || !wrapRef.current) return;
 
     const sep = VSL_URL.indexOf('?') > -1 ? '&' : '?';
-    const src = `${VSL_URL}${sep}autoplay=1&muted=0&playsinline=1&autopause=0&transparent=0&dnt=1`;
+    const src = `${VSL_URL}${sep}autoplay=1&muted=0&playsinline=1&autopause=0&transparent=0`;
 
     const iframe = document.createElement('iframe');
     iframe.src = src;

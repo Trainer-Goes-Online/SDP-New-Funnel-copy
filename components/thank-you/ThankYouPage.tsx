@@ -21,7 +21,7 @@ function VSLVideo() {
     if (!playing || !wrapRef.current) return;
 
     const sep = TY_VIDEO_URL.indexOf('?') > -1 ? '&' : '?';
-    const src = `${TY_VIDEO_URL}${sep}autoplay=1&muted=0&playsinline=1&autopause=0&transparent=0&dnt=1`;
+    const src = `${TY_VIDEO_URL}${sep}autoplay=1&muted=0&playsinline=1&autopause=0&transparent=0`;
 
     const iframe = document.createElement('iframe');
     iframe.src = src;
