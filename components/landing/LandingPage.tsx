@@ -1452,7 +1452,7 @@ function ComparisonMatrix() {
                     <circle cx="12" cy="10" r="3" />
                   </svg>
                 </span>
-                <span className="sdp-cmp-mh-name">Local Trainer</span>
+                <span className="sdp-cmp-mh-name">Gym Trainer</span>
               </div>
               <div className="sdp-cmp-mh-prov is-hero">
                 <span className="sdp-cmp-mh-ic" aria-hidden="true">
