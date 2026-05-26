@@ -135,8 +135,27 @@ export async function POST(req: NextRequest) {
       console.log('[verify-payment] Test bypass — signature check skipped:', paymentId);
     }
 
+    // Tracking signals hoisted so the same values feed both the Pabbly webhook
+    // (Sheet row → Apps Script reads later) and the Meta CAPI fire below.
+    const fbc = req.cookies.get('_fbc')?.value;
+    const fbp = req.cookies.get('_fbp')?.value;
+    const clientIp =
+      req.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
+      req.headers.get('x-real-ip') ??
+      undefined;
+    const clientUserAgent = req.headers.get('user-agent') ?? undefined;
+    const resolvedEventSourceUrl =
+      eventSourceUrl ?? 'https://sdp.sciencedrivenperformance.in/new-checkout-page';
+    const externalIdHash = customer.email
+      ? crypto
+          .createHash('sha256')
+          .update(customer.email.trim().toLowerCase())
+          .digest('hex')
+      : '';
+
     const now = new Date();
     const pabblyPayload = {
+      lead_id:           paymentId,
       first_name:        customer.firstName,
       last_name:         customer.lastName,
       full_name:         `${customer.firstName} ${customer.lastName}`,
@@ -168,6 +187,12 @@ export async function POST(req: NextRequest) {
       referrer:          utm?.referrer     ?? '',
       landing_path:      utm?.landing_path ?? '',
       first_seen:        utm?.first_seen   ?? '',
+      event_source_url:  resolvedEventSourceUrl,
+      fbc:               fbc ?? '',
+      fbp:               fbp ?? '',
+      external_id:       externalIdHash,
+      client_ip_address: clientIp ?? '',
+      client_user_agent: clientUserAgent ?? '',
     };
 
     console.log('[verify-payment] Verified purchase:', pabblyPayload.payment_id);
@@ -195,13 +220,6 @@ export async function POST(req: NextRequest) {
     const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID ?? process.env.META_PIXEL_ID;
     const metaAccessToken = process.env.META_CAPI_ACCESS_TOKEN;
     if (metaPixelId && metaAccessToken && !isTestBypass) {
-      const fbc = req.cookies.get('_fbc')?.value;
-      const fbp = req.cookies.get('_fbp')?.value;
-      const clientIp =
-        req.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
-        req.headers.get('x-real-ip') ??
-        undefined;
-      const clientUserAgent = req.headers.get('user-agent') ?? undefined;
       const fullPhone = `${customer.dialCode}${customer.phone}`;
       try {
         const capiResult = await sendMetaCapiEvent({
@@ -214,7 +232,7 @@ export async function POST(req: NextRequest) {
           lastName: customer.lastName,
           city: customer.city,
           country: customer.countryCode,
-          eventSourceUrl: eventSourceUrl ?? 'https://sdp.sciencedrivenperformance.in/new-checkout-page',
+          eventSourceUrl: resolvedEventSourceUrl,
           fbc,
           fbp,
           clientIp,
