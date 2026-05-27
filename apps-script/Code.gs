@@ -218,9 +218,11 @@ function fireDownstreamEvent(sheet, row, cfg) {
   const result = postToMetaCapi({ data: [eventBody] });
 
   if (result.ok) {
-    // Stamp success. Apps Script writes are atomic per cell.
+    // Stamp success. We write the STRING 'TRUE' (not boolean true) so it
+    // renders correctly in dropdown cells that have data validation list
+    // {TRUE, FALSE}. Reading is handled by isTruthy() which accepts either.
     sheet.getRange(row, cfg.eventIdCol).setValue(eventId);
-    sheet.getRange(row, cfg.sentCol).setValue(true);
+    sheet.getRange(row, cfg.sentCol).setValue('TRUE');
     console.log('Row ' + row + ' ' + cfg.eventName + ' OK | event_id=' + eventId
       + ' attempts=' + (result.retryCount + 1));
   } else {

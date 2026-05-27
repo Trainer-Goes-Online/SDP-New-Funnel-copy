@@ -1,9 +1,9 @@
 # SDP CRM — Apps Script Downstream CAPI Engine
 
 Apps Script bound to the **SDP CRM** Google Sheet that fires three downstream
-Meta Conversions API events whenever a sales-team-edited checkbox is toggled:
+Meta Conversions API events whenever a sales-team-edited dropdown is set to TRUE:
 
-| Sheet checkbox flipped to TRUE | Meta CAPI event fired | Carries value? |
+| Sheet dropdown set to TRUE | Meta CAPI event fired | Carries value? |
 |---|---|---|
 | `call_booked` (col X) | `CallBookedWithSDP` | no |
 | `call_showed` (col AB) | `CallDoneWithSDP` | no |
@@ -39,7 +39,7 @@ Before deploying, the following must be true:
    `timestamp | row_number | event_type | http_status | response_body | retry_count`
 
 3. **Column types are correctly set**:
-   - X, AA, AB, AE, AF, AJ → **Checkbox** (Insert → Checkbox)
+   - X, AA, AB, AE, AF, AJ → **Dropdown** (Data → Data validation → Dropdown → values `TRUE` and `FALSE`, exact uppercase). **Do NOT use checkboxes** — they pre-populate as FALSE when Pabbly creates a new row, which is indistinguishable from "sales team explicitly marked FALSE". Dropdowns stay empty until someone picks a value.
    - Y, AC, AH → **Date+time** (Format → Number → Date time)
    - AG → **Plain number** (no thousands separator, no currency symbol)
 
@@ -125,15 +125,15 @@ Don't trust unverified code — test it against Meta's Test Events tab.
 
 - Open the SDP CRM Sheet.
 - Find a real row (or paste the dummy row from the bottom of this README).
-- Toggle the `call_booked` checkbox (column X) to TRUE.
+- Click the `call_booked` dropdown (column X) → select `TRUE`.
 - Wait 5-10 seconds.
 - In Meta Events Manager → Test Events: a `CallBookedWithSDP` event should appear.
   - Source: Server
   - Event Match Quality: should be 8-9+ if all identifier columns are populated
   - User parameters: email, phone, fn, ln, ct, country, external_id all shown as "Sent"
-- Back in the Sheet: column Z should now hold `pay_xxx_schedule`, column AA should be checked.
+- Back in the Sheet: column Z should now hold `pay_xxx_schedule`, column AA should now show `TRUE`.
 - Repeat for `call_showed` (col AB) — expect `CallDoneWithSDP` to appear.
-- Repeat for `sale_closed` (col AF) — but FIRST fill in `contracted_value` (col AG) with a number like `60000`, then check the box. Expect `SDPHighTicketPurchase` with `value: 60000` in custom_data.
+- Repeat for `sale_closed` (col AF) — but FIRST fill in `contracted_value` (col AG) with a number like `60000`, then set the dropdown to `TRUE`. Expect `SDPHighTicketPurchase` with `value: 60000` in custom_data.
 
 **Option B — paste a dummy row** if Pabbly isn't writing real rows yet (see "Dummy row" section at the bottom of this README).
 
@@ -176,7 +176,7 @@ onSheetEdit reads e.range, identifies col X = call_booked
   ↓
 Looks up EVENTS.CALL_BOOKED config (eventName, columns, suffix)
   ↓
-Checks e.value is TRUE (it is — checkbox just flipped on)
+Checks e.value is TRUE (it is — TRUE just selected from dropdown)
   ↓
 Reads col AA (schedule_capi_sent) — confirms it's blank/FALSE (not already sent)
   ↓
@@ -226,14 +226,14 @@ The downside: if you want to fire the same event_name for the same lead twice (e
 - **Success logs**: Apps Script editor → **Executions** tab (left sidebar). Filter by function name `onSheetEdit` or `fireDownstreamEvent`.
 - **Failures**: same Executions tab AND the `_Errors` tab in the Sheet.
 
-### A row's checkbox is checked but the event never fired
+### A row's dropdown is set to TRUE but the event never fired
 
 Check in order:
 
 1. **Was the trigger installed?** Apps Script editor → Triggers (left sidebar, clock icon). You should see one entry: `onSheetEdit` for spreadsheet `SDP CRM`, event `On edit`.
    - If empty: run `setupTriggers` again.
-2. **Did the trigger fire?** Apps Script editor → Executions. Filter for the time you flipped the checkbox.
-   - If no execution shown: Pabbly's "Add Row" or some other automation might be writing TRUE to checkboxes — installable onEdit doesn't fire on the very first row creation by API in some edge cases. Workaround: un-check then re-check.
+2. **Did the trigger fire?** Apps Script editor → Executions. Filter for the time you changed the dropdown.
+   - If no execution shown: Pabbly's "Add Row" or some other automation might be writing TRUE to a manual column via API — installable onEdit doesn't always fire for those programmatic writes. Workaround: set the dropdown back to blank, then to TRUE again.
 3. **Did the script run but exit early?** Check the execution log for messages like `already sent, skipping` (meaning the dedup flag was already TRUE).
 4. **Did the script call Meta but get a non-200?** Check `_Errors` tab for a recent row matching this event + row number.
 
@@ -250,14 +250,14 @@ Usually means one or more identifier columns is blank for that row. Open the row
 The dedup flag prevents accidental re-fires. To intentionally re-fire:
 
 1. Open the row.
-2. Manually un-check the `*_capi_sent` flag column (AA / AE / AJ).
-3. Un-check then re-check the trigger column (X / AB / AF).
+2. Manually clear the `*_capi_sent` flag column (AA / AE / AJ) — set it back to blank or FALSE.
+3. Set the trigger column dropdown (X / AB / AF) back to blank, then to TRUE again.
 
 The event fires fresh. If event_id matches a previous fire within 48h, Meta dedupes — so the second fire usually doesn't increment Meta's count.
 
 ### Bulk replay
 
-To replay every row that has a triggered checkbox but no corresponding sent flag (e.g., after a Meta API outage):
+To replay every row that has a TRUE trigger dropdown but no corresponding sent flag (e.g., after a Meta API outage):
 
 1. Apps Script editor → function dropdown → `replayPendingEvents`.
 2. Click Run.
@@ -312,15 +312,15 @@ so the Apps Script's hash matches it (sanity check that hashing is correct).
 
 After pasting, the smoke test sequence is:
 
-1. **Test `CallBookedWithSDP`**: check the box in col X. After 5-10 seconds:
+1. **Test `CallBookedWithSDP`**: set col X dropdown to `TRUE`. After 5-10 seconds:
    - Col Z should hold `pay_dummyABC123_schedule`.
-   - Col AA should be checked.
+   - Col AA should now show `TRUE`.
    - Meta Test Events tab should show `CallBookedWithSDP` with EMQ ~9.
-2. **Test `CallDoneWithSDP`**: fill col AC with `2026-05-27 15:30`, then check col AB. After 5-10 seconds:
+2. **Test `CallDoneWithSDP`**: fill col AC with `2026-05-27 15:30`, then set col AB dropdown to `TRUE`. After 5-10 seconds:
    - Col AD should hold `pay_dummyABC123_showup`.
-   - Col AE should be checked.
+   - Col AE should now show `TRUE`.
    - Meta Test Events should show `CallDoneWithSDP`.
-3. **Test `SDPHighTicketPurchase`**: fill col AG with `60000`, fill col AH with `2026-05-27 15:45`, then check col AF. After 5-10 seconds:
+3. **Test `SDPHighTicketPurchase`**: fill col AG with `60000`, fill col AH with `2026-05-27 15:45`, then set col AF dropdown to `TRUE`. After 5-10 seconds:
    - Col AI should hold `pay_dummyABC123_htsale`.
    - Col AJ should be checked.
    - Meta Test Events should show `SDPHighTicketPurchase` with `value: 60000, currency: INR`.
@@ -336,4 +336,4 @@ Executions log.
 - **Apps Script execution time limit**: 6 minutes per simple trigger / 30 minutes per installable. A single CAPI fire is sub-second, so this is irrelevant for routine operation. Only `replayPendingEvents` over hundreds of rows could approach this.
 - **`UrlFetchApp` daily quota**: 20,000 calls/day on consumer Google accounts, 100,000/day on Workspace. SDP volume is far below this.
 - **Script Properties are visible to all editors** of the Apps Script project. Restrict editor access to dev/ops only; give sales team only viewer + commenter access to the Sheet itself.
-- **Apps Script does NOT fire on programmatic edits** from external Sheets API callers (like Pabbly's "Add Row") in some configurations. Installable `onEdit` is supposed to fire for both, but behavior is documented inconsistently. Manual checkbox toggles by sales team are the canonical trigger path and always work.
+- **Apps Script does NOT fire on programmatic edits** from external Sheets API callers (like Pabbly's "Add Row") in some configurations. Installable `onEdit` is supposed to fire for both, but behavior is documented inconsistently. Manual dropdown selections by sales team are the canonical trigger path and always work — which is exactly why we use dropdowns (empty by default until a human selects TRUE/FALSE) rather than checkboxes (which pre-populate as FALSE on row creation and would generate noise from Pabbly's writes).
