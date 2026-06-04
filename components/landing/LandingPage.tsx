@@ -287,18 +287,17 @@ function Hero() {
     <section className="sdp-hero">
       <div className="sdp-wrap sdp-hero-inner">
         <div className="sdp-callout" data-sdp-reveal>
-          For Senior Professionals Who’ve
+          For High-Performing Professionals 30+ Who Keep Restarting Their Fitness Journey
         </div>
 
         <h1 className="sdp-h1" data-sdp-reveal style={{ ['--d' as string]: '.06s' }}>
-          <span className="sdp-h1-l1">RESTARTED THEIR FITNESS 3+ TIMES</span>
-          <span className="sdp-h1-l2">A 90-Day System Designed To Survive</span>
-          <span className="sdp-h1-l3">Travel Weeks, Deadlines, And Real Life.</span>
+          <span className="sdp-h1-l1">Lose Up To 8-10% Body Fat In The Next 90 Days</span>
+          <span className="sdp-h1-l2">With Our Constraint-Based Fitness Model Designed To Work Even During Travel, Deadlines, And Demanding Work Schedules.</span>
         </h1>
 
         <p className="sdp-hero-sub" data-sdp-reveal style={{ ['--d' as string]: '.14s' }}>
           <strong>550+ Indian and NRI professionals</strong> have used our science-driven
-          approach to <mark>lose 10% body weight</mark> and improve key blood markers like:
+          approach to <mark>lose 10% body fat</mark> and improve key blood markers like:
         </p>
 
         <div

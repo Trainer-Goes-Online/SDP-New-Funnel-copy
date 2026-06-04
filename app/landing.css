@@ -274,12 +274,14 @@
   display:block; font-family:var(--fh)!important;
   font-size:clamp(34px,5.6vw,70px)!important;
   color:var(--ink,#0F172A)!important; line-height:1.0!important; letter-spacing:.02em!important;
+  text-wrap:balance;
 }
 .sdp-root .sdp-h1-l2,.sdp-root .sdp-h1-l3{
   display:block; font-family:var(--fh)!important;
   font-size:clamp(20px,3vw,36px)!important;
   color:var(--brand-deep,#1E40AF)!important; line-height:1.1!important;
   margin-top:8px!important;
+  text-wrap:balance;
 }
 .sdp-root .sdp-h1-l3{ margin-top:2px!important; }
 
@@ -2177,7 +2179,7 @@ body.admin-bar .sdp-root .sdp-lbox-close{ top:52px!important; }
   /* Hero */
   .sdp-root .sdp-callout{ font-size:10.5px!important; padding:7px 14px!important; letter-spacing:.08em!important; gap:7px!important; }
   .sdp-root .sdp-h1-l1{ font-size:30px!important; }
-  .sdp-root .sdp-h1-l2,.sdp-root .sdp-h1-l3{ font-size:18px!important; margin-top:6px!important; }
+  .sdp-root .sdp-h1-l2,.sdp-root .sdp-h1-l3{ font-size:22px!important; margin-top:18px!important; }
   .sdp-root .sdp-hero-sub{ font-size:14px!important; }
   .sdp-root .sdp-above-vsl{ font-size:12px!important; }
   .sdp-root .sdp-below-vsl{ font-size:12.5px!important; }
