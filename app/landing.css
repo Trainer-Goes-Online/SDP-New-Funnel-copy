@@ -92,7 +92,7 @@
 
 .sdp-root h2.sdp-h2{
   text-align:center; font-size:clamp(28px,4.4vw,52px)!important;
-  letter-spacing:.02em!important; margin-bottom:14px!important; line-height:1.05!important;
+  letter-spacing:.02em!important; margin-bottom:14px!important; line-height:1.18!important;
 }
 .sdp-root h2.sdp-h2 em{ font-style:normal; }
 .sdp-root .sdp-light h2.sdp-h2 em,.sdp-root .sdp-light-alt h2.sdp-h2 em{ color:var(--brand,#3B82F6)!important; }
@@ -189,6 +189,148 @@
 @keyframes sdpAnnScroll { from{ transform:translateX(0);} to{ transform:translateX(-50%);} }
 
 /* ================================================================
+   TRUST BANNER + TRUST STRIP (Batch 1) — top of page, replaces marquee
+================================================================ */
+.sdp-root .sdp-trust-banner{
+  background:linear-gradient(90deg,var(--brand-deep,#1E40AF),var(--brand,#3B82F6) 50%,var(--brand-deep,#1E40AF))!important;
+  color:#fff!important;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  padding:9px 16px;
+  font-family:var(--fb)!important; font-weight:800!important;
+  font-size:12.5px!important; letter-spacing:.08em!important; text-transform:uppercase!important;
+  line-height:1.2;
+  border-bottom:1px solid rgba(255,255,255,.1);
+}
+.sdp-root .sdp-trust-banner b{ color:var(--cyan-accent,#22D3EE)!important; font-weight:800!important; }
+.sdp-root .sdp-trust-banner-dot{
+  width:7px; height:7px; border-radius:50%;
+  background:var(--cyan-accent,#22D3EE);
+  flex:0 0 7px;
+  animation:sdpPulse 1.8s ease-in-out infinite;
+}
+
+.sdp-root .sdp-trust-strip{
+  display:flex; align-items:center; justify-content:center;
+  gap:20px;
+  padding:10px 16px;
+  background:#F8FAFC;
+  border-bottom:1px solid rgba(15,23,42,.06);
+  flex-wrap:wrap;
+}
+.sdp-root .sdp-trust-strip-avatars{ display:inline-flex; align-items:center; }
+.sdp-root .sdp-trust-strip-avatar{
+  display:inline-block;
+  width:32px; height:32px;
+  aspect-ratio:1/1;
+  flex:0 0 32px;
+  border-radius:50%;
+  border:1.5px solid #fff;
+  box-shadow:0 0 0 1px rgba(15,23,42,.08);
+  background-color:#E2E8F0;
+  background-size:140% auto;       /* zoom in 40% past the source's bottom area */
+  background-position:center 12%;  /* show top portion (face); crop bottom (play icon) */
+  background-repeat:no-repeat;
+  margin-left:-6px;
+}
+.sdp-root .sdp-trust-strip-avatars img:first-child{ margin-left:0; }
+.sdp-root .sdp-trust-strip-item{
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--fb); font-size:13px; color:var(--ink,#0F172A);
+  font-weight:600; line-height:1.2;
+}
+.sdp-root .sdp-trust-strip-item b{ color:var(--ink,#0F172A); font-weight:800; }
+.sdp-root .sdp-trust-strip-stars{ color:#F59E0B; letter-spacing:.04em; font-size:13px; }
+.sdp-root .sdp-trust-strip-check{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:18px; height:18px; color:#10B981;
+}
+.sdp-root .sdp-trust-strip-check svg{ width:18px; height:18px; }
+
+/* ================================================================
+   URGENCY LINE (Batch 1) — live countdown timer below every CTA
+================================================================ */
+.sdp-root .sdp-urgency{
+  font-family:var(--fb);
+  display:flex; align-items:center; justify-content:center;
+  flex-wrap:wrap; gap:10px;
+  text-align:center;
+  margin:12px auto 0!important;
+}
+.sdp-root .sdp-urgency-label{
+  font-size:12.5px; font-weight:700;
+  color:var(--ink-soft,#475569);
+  letter-spacing:.06em; text-transform:uppercase;
+}
+.sdp-root .sdp-urgency-timer{
+  display:inline-flex; align-items:stretch; gap:0;
+  padding:6px 10px;
+  border-radius:8px;
+  background:linear-gradient(135deg,#DC2626 0%,#EF4444 100%);
+  box-shadow:0 4px 14px rgba(220,38,38,.28), inset 0 1px 0 rgba(255,255,255,.18);
+  color:#fff;
+  font-variant-numeric:tabular-nums;
+  animation:sdpUrgencyPulse 2s ease-in-out infinite;
+}
+.sdp-root .sdp-urgency-unit{
+  display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
+  min-width:34px;
+  padding:0 6px;
+}
+.sdp-root .sdp-urgency-unit b{
+  display:block; font-size:18px; font-weight:800;
+  line-height:1; color:#fff!important;
+  letter-spacing:.02em;
+}
+.sdp-root .sdp-urgency-unit > span{
+  display:block; font-size:8.5px; font-weight:700;
+  color:rgba(255,255,255,.92)!important;
+  letter-spacing:.10em; text-transform:uppercase;
+  margin-top:3px;
+}
+.sdp-root .sdp-urgency-sep{
+  display:inline-flex; align-items:center;
+  color:rgba(255,255,255,.55);
+  font-weight:800; font-size:16px;
+  padding:0 1px; padding-top:2px;
+}
+@keyframes sdpUrgencyPulse {
+  0%,100% { box-shadow:0 4px 14px rgba(220,38,38,.28), inset 0 1px 0 rgba(255,255,255,.18); }
+  50%     { box-shadow:0 6px 22px rgba(220,38,38,.45), inset 0 1px 0 rgba(255,255,255,.18); }
+}
+.sdp-root .sdp-dark .sdp-urgency-label,
+.sdp-root .sdp-dark-alt .sdp-urgency-label{ color:var(--muted-dark,#94A3B8); }
+
+/* ================================================================
+   RISK REVERSAL STRIP (Batch 2) — 3 badges between CTA and urgency
+================================================================ */
+.sdp-root .sdp-risk-strip{
+  display:flex; align-items:center; justify-content:center;
+  flex-wrap:wrap; gap:16px;
+  margin:14px auto 0;
+  max-width:560px;
+}
+.sdp-root .sdp-risk-badge{
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--fb); font-size:12.5px;
+  color:var(--ink-soft,#475569);
+  font-weight:600; line-height:1.2;
+  white-space:nowrap;
+}
+.sdp-root .sdp-risk-icon{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:16px; height:16px; flex:0 0 16px;
+}
+.sdp-root .sdp-risk-icon svg{ width:16px; height:16px; }
+.sdp-root .sdp-risk-icon-green{ color:#10B981; }
+.sdp-root .sdp-risk-icon-gold{ color:#F59E0B; }
+.sdp-root .sdp-risk-icon-blue{ color:var(--brand-deep,#1E40AF); }
+
+.sdp-root .sdp-dark .sdp-risk-badge,
+.sdp-root .sdp-dark-alt .sdp-risk-badge{ color:var(--muted-dark,#94A3B8); }
+.sdp-root .sdp-dark .sdp-risk-icon-blue,
+.sdp-root .sdp-dark-alt .sdp-risk-icon-blue{ color:var(--brand-bright,#60A5FA); }
+
+/* ================================================================
    SITE HEADER â€” LOGO BAR
 ================================================================ */
 .sdp-root .sdp-header{
@@ -225,7 +367,7 @@
    HERO (LIGHT)
 ================================================================ */
 .sdp-root .sdp-hero{
-  padding:36px 0 44px!important;
+  padding:14px 0 44px!important;
   background:linear-gradient(180deg,#FAFBFD 0%,#F1F5F9 100%)!important;
   color:var(--ink,#0F172A)!important;
   overflow:hidden; position:relative;
@@ -1308,8 +1450,16 @@
 .sdp-root .sdp-saket-role{
   font-size:11px!important; letter-spacing:.14em!important;
   text-transform:uppercase!important; color:var(--brand-deep,#1E40AF)!important;
-  font-weight:700!important; margin:0 0 6px!important;
+  font-weight:700!important; margin:0 0 4px!important;
 }
+.sdp-root .sdp-saket-followers{
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--fb); font-size:12.5px;
+  color:var(--ink-soft,#475569); font-weight:600;
+  margin:0 0 6px;
+}
+.sdp-root .sdp-saket-followers b{ color:var(--ink,#0F172A); font-weight:800; }
+.sdp-root .sdp-saket-followers svg{ width:14px; height:14px; color:var(--brand-deep,#1E40AF); }
 .sdp-root .sdp-saket-stars{
   display:inline-flex; gap:2px;
 }
@@ -1953,11 +2103,23 @@
 .sdp-root .sdp-stuck-s{
   font-family:var(--fb)!important;
   font-size:11px!important; font-weight:600!important;
-  letter-spacing:.08em!important; text-transform:uppercase!important;
+  letter-spacing:.02em!important; text-transform:none!important;
   color:var(--muted-dark,#94A3B8)!important;
-  margin-top:3px;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  margin-top:4px;
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  white-space:nowrap;
 }
+.sdp-root .sdp-stuck-badge{
+  display:inline-flex; align-items:center; gap:5px;
+  color:var(--muted-dark,#CBD5E1)!important;
+}
+.sdp-root .sdp-stuck-badge svg{
+  width:13px; height:13px; flex:0 0 13px;
+}
+.sdp-root .sdp-stuck-badge:nth-of-type(1) svg{ color:#10B981; }
+.sdp-root .sdp-stuck-badge:nth-of-type(2) svg{ color:#F59E0B; }
+.sdp-root .sdp-stuck-badge b{ color:#F8FAFC!important; font-weight:800; }
+.sdp-root .sdp-stuck-badge-sep{ color:rgba(255,255,255,.25); }
 .sdp-root .sdp-stuck .sdp-cta{
   flex:0 0 auto;
   flex-direction:row!important;
@@ -2165,7 +2327,7 @@ body.admin-bar .sdp-root .sdp-lbox-close{ top:52px!important; }
   .sdp-root .sdp-faq{ padding:48px 0!important; }
   .sdp-root .sdp-final{ padding:56px 0 48px!important; }
   .sdp-root .sdp-callout-band{ padding:44px 18px!important; }
-  .sdp-root .sdp-hero{ padding:32px 0 40px!important; }
+  .sdp-root .sdp-hero{ padding:18px 0 24px!important; }
 
   .sdp-root .sdp-wrap{ padding:0 16px!important; }
 
@@ -2175,6 +2337,25 @@ body.admin-bar .sdp-root .sdp-lbox-close{ top:52px!important; }
     font-size:11px!important; letter-spacing:.08em!important;
     gap:36px!important; padding:9px 0!important;
   }
+
+  /* Trust banner + strip (Batch 1) — mobile */
+  .sdp-root .sdp-trust-banner{ font-size:10.5px!important; padding:8px 12px!important; letter-spacing:.06em!important; gap:8px!important; line-height:1.3!important; }
+  .sdp-root .sdp-trust-strip{ gap:12px!important; padding:9px 12px!important; }
+  .sdp-root .sdp-trust-strip-avatar{ width:28px!important; height:28px!important; flex:0 0 28px!important; margin-left:-5px!important; }
+  .sdp-root .sdp-trust-strip-item{ font-size:12px!important; }
+  .sdp-root .sdp-trust-strip-stars{ font-size:12px!important; }
+  .sdp-root .sdp-urgency{ gap:8px!important; margin-top:10px!important; }
+  .sdp-root .sdp-urgency-label{ font-size:11px!important; letter-spacing:.04em!important; }
+  .sdp-root .sdp-urgency-timer{ padding:5px 8px!important; border-radius:7px!important; }
+  .sdp-root .sdp-urgency-unit{ min-width:28px!important; padding:0 4px!important; }
+  .sdp-root .sdp-urgency-unit b{ font-size:15px!important; }
+  .sdp-root .sdp-urgency-unit > span{ font-size:7.5px!important; margin-top:2px!important; }
+  .sdp-root .sdp-urgency-sep{ font-size:14px!important; }
+
+  /* Risk reversal strip (Batch 2) — mobile */
+  .sdp-root .sdp-risk-strip{ gap:10px!important; margin-top:10px!important; }
+  .sdp-root .sdp-risk-badge{ font-size:11px!important; }
+  .sdp-root .sdp-risk-icon, .sdp-root .sdp-risk-icon svg{ width:14px!important; height:14px!important; }
 
   /* Hero */
   .sdp-root .sdp-callout{ font-size:10.5px!important; padding:7px 14px!important; letter-spacing:.08em!important; gap:7px!important; }
@@ -2186,10 +2367,18 @@ body.admin-bar .sdp-root .sdp-lbox-close{ top:52px!important; }
   .sdp-root .sdp-play{ width:60px!important; height:60px!important; }
   .sdp-root .sdp-play svg{ width:22px!important; height:22px!important; }
   /* Hero credibility row â€” 2x2 in tinted blue cards */
-  .sdp-root .sdp-cred-row{ grid-template-columns:repeat(2,1fr)!important; gap:10px!important; max-width:100%; margin-top:24px; }
-  .sdp-root .sdp-cred-card{ background:rgba(59,130,246,.06)!important; border-color:rgba(59,130,246,.2)!important; padding:12px 8px; }
+  .sdp-root .sdp-cred-row{ grid-template-columns:repeat(2,1fr)!important; gap:10px!important; max-width:100%; margin-top:14px; }
+  .sdp-root .sdp-cred-card{ background:rgba(59,130,246,.06)!important; border-color:rgba(59,130,246,.2)!important; padding:10px 8px; }
   .sdp-root .sdp-cred-num{ font-size:20px!important; }
   .sdp-root .sdp-cred-lbl{ font-size:9.5px!important; }
+
+  /* Hero compaction (Batch 2) — tighten vertical rhythm so above-the-fold fits on iPhone SE */
+  .sdp-root .sdp-h1{ margin:0 auto 10px!important; }
+  .sdp-root .sdp-hero-sub{ margin:0 auto 10px!important; }
+  .sdp-root .sdp-hero-markers{ margin:6px auto!important; }
+  .sdp-root .sdp-above-vsl{ margin:8px auto 6px!important; }
+  .sdp-root .sdp-video-frame{ margin:0 auto 8px!important; }
+  .sdp-root .sdp-cta-block{ margin:6px auto 0!important; }
   /* Trust strip â€” horizontal scroll if needed */
   .sdp-root .sdp-trust{
     display:grid!important; grid-template-columns:repeat(2,1fr)!important;
@@ -2357,21 +2546,57 @@ body.admin-bar .sdp-root .sdp-lbox-close{ top:52px!important; }
   .sdp-root .sdp-foot .links a{ font-size:10.5px!important; margin:0 6px!important; white-space:nowrap!important; }
   .sdp-root .sdp-foot p{ font-size:11px!important; padding:0 8px; }
 
-  /* Sticky strip â€” mobile collapses to full-width pill */
+  /* Sticky strip — mobile: button on top, trust badges row below */
   .sdp-root .sdp-stuck{ padding:10px 0 calc(12px + env(safe-area-inset-bottom)); }
-  .sdp-root .sdp-stuck-inner{ padding:0 14px; gap:0; }
-  .sdp-root .sdp-stuck-meta{ display:none!important; }
+  .sdp-root .sdp-stuck-inner{
+    padding:0 14px;
+    flex-direction:column-reverse!important;
+    align-items:stretch!important;
+    gap:8px!important;
+  }
+  /* Show meta but reduce it to just the badges row */
+  .sdp-root .sdp-stuck-meta{
+    display:flex!important;
+    flex-direction:column; align-items:center; justify-content:center;
+    gap:0!important; flex:none!important;
+  }
+  .sdp-root .sdp-stuck-pulse,
+  .sdp-root .sdp-stuck-h{ display:none!important; }
+  .sdp-root .sdp-stuck-text{ width:100%; min-width:0; }
+  .sdp-root .sdp-stuck-s{
+    justify-content:center!important;
+    margin-top:0!important;
+    font-size:10.5px!important;
+    gap:10px!important;
+  }
+  .sdp-root .sdp-stuck-s .sdp-stuck-badge svg{ width:12px!important; height:12px!important; flex:0 0 12px!important; }
+
+  /* CTA button — full width, two-line wrap with "+ Fitness Roadmap" on line 2 */
   .sdp-root .sdp-stuck .sdp-cta{
     width:100%!important; max-width:100%!important;
     flex-direction:column!important;
-    font-size:14.5px!important;
     padding:10px 18px 9px!important;
-    gap:3px!important;
+    gap:0!important;
   }
-  .sdp-root .sdp-stuck .sdp-cta .cta-top{ font-size:14.5px!important; gap:8px!important; }
-  .sdp-root .sdp-stuck .sdp-cta .cta-sub{
-    display:inline-flex!important; font-size:9.5px!important; opacity:.78!important;
+  .sdp-root .sdp-stuck .sdp-cta .cta-top{
+    font-size:18px!important;
+    gap:8px!important;
+    flex-wrap:nowrap!important;
+    line-height:1.04!important;
+    align-items:center!important;
   }
+  .sdp-root .sdp-stuck .sdp-stuck-cta-text{
+    display:inline-block; text-align:center;
+    white-space:normal;
+  }
+  /* "+ Fitness Roadmap" on its own line on mobile — display:block gives a
+     clean line break with NO inherent baseline gap (the \A content trick
+     adds an extra line baseline that visibly separates the two rows). */
+  .sdp-root .sdp-stuck .sdp-stuck-cta-tail{
+    display:block;
+    margin-top:1px;
+  }
+  .sdp-root .sdp-stuck .sdp-cta .cta-sub{ display:none!important; }
 
   /* Lightbox mobile */
   .sdp-root .sdp-lbox-nav{ width:46px!important; height:46px!important; }
@@ -2421,13 +2646,12 @@ body.admin-bar .sdp-root .sdp-lbox-close{ top:52px!important; }
 }
 
 /* Hero callout pill â€” soft float */
-.sdp-root .sdp-callout{ animation:sdpFloat 4s ease-in-out infinite; }
-@keyframes sdpFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-3px); } }
+/* sdpFloat removed: callout pill stays static; only the dot pulses */
 
 /* H2 em â€” underline draw on reveal */
 .sdp-root h2.sdp-h2 em{ position:relative; display:inline-block; }
 .sdp-root h2.sdp-h2 em::after{
-  content:""; position:absolute; left:8%; right:8%; bottom:-4px; height:2px;
+  content:""; position:absolute; left:8%; right:8%; bottom:-1px; height:2px;
   background:linear-gradient(90deg,transparent,currentColor,transparent);
   transform:scaleX(0); transform-origin:center;
   transition:transform 1s cubic-bezier(.4,0,.2,1) .35s;

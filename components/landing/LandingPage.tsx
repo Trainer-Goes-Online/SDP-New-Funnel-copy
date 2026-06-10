@@ -40,16 +40,17 @@ function SdpCta({
     >
       <a href={href} className="sdp-cta">
         <span className="cta-top">
-          <span className="cta-d">Book Your ₹97 Pre-Strategy Session</span>
-          <span className="cta-m">Book Pre-Strategy Call • ₹97</span>
+          <span className="cta-d">Click Here To Get Your Personalised Diagnosis + Fitness Roadmap</span>
+          <span className="cta-m">Click Here To Get Your Personalised Diagnosis + Fitness Roadmap</span>
           <span className="arrow">
             <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M5 12h14M13 5l7 7-7 7" />
             </svg>
           </span>
         </span>
-        <span className="cta-sub">15-Min Phone Call &nbsp;•&nbsp; Refundable &nbsp;•&nbsp; No Pressure</span>
       </a>
+      <RiskReversalStrip />
+      <UrgencyLine />
     </div>
   );
 }
@@ -127,26 +128,165 @@ function VideoModal({ videoUrl, onClose }: { videoUrl: string | null; onClose: (
 }
 
 /* ============================================================
-   Section: Announce bar
+   Section: Trust banner + Trust strip (replace old announce bar)
    ============================================================ */
 
-function AnnounceBar() {
+function TrustBanner() {
   return (
-    <div className="sdp-announce">
-      <div className="sdp-announce-track">
-        {[0, 1].map(loop => (
-          <span key={loop} className="sdp-announce-loop">
-            <span>Science-Based Fitness For Senior Professionals</span>
-            <span className="dot" />
-            <span><b>550+</b> Indian &amp; NRI Professionals Coached</span>
-            <span className="dot" />
-            <span>Backed By <b>Blood Marker Analysis</b></span>
-            <span className="dot" />
-            <span>Built For Travel Weeks, Deadlines &amp; Real Life</span>
-            <span className="dot" />
-          </span>
+    <div className="sdp-trust-banner" role="note">
+      <span className="sdp-trust-banner-dot" aria-hidden="true" />
+      <span>
+        <b>10+ Years</b> of Experience and <b>550+ Success Stories</b>
+      </span>
+    </div>
+  );
+}
+
+/* Trust-strip portraits — served locally from public/trust strip/. */
+const TRUST_AVATARS: { src: string; alt: string }[] = [
+  { src: '/trust%20strip/1.png', alt: 'Reviewer 1' },
+  { src: '/trust%20strip/2.png', alt: 'Reviewer 2' },
+  { src: '/trust%20strip/3.png', alt: 'Reviewer 3' },
+  { src: '/trust%20strip/4.png', alt: 'Reviewer 4' },
+];
+
+function TrustStrip() {
+  return (
+    <div className="sdp-trust-strip">
+      <div className="sdp-trust-strip-avatars" aria-hidden="true">
+        {TRUST_AVATARS.map(a => (
+          <span
+            key={a.src}
+            className="sdp-trust-strip-avatar"
+            role="img"
+            aria-label={a.alt}
+            style={{ backgroundImage: `url("${a.src}")` }}
+          />
         ))}
       </div>
+      <div className="sdp-trust-strip-item">
+        <span className="sdp-trust-strip-stars" aria-hidden="true">★★★★★</span>
+        <span><b>5.0</b> Review</span>
+      </div>
+      <div className="sdp-trust-strip-item">
+        <span className="sdp-trust-strip-check" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2l8 3v7c0 4.97-3.35 9.26-8 10-4.65-.74-8-5.03-8-10V5l8-3z" />
+            <polyline points="9 12 11 14 15 10" />
+          </svg>
+        </span>
+        <span><b>100%</b> Guaranteed Results</span>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   Urgency line (rendered below every primary CTA)
+   ============================================================ */
+
+/* Countdown deadline:
+   - Persisted in localStorage so the same browser/profile keeps the same
+     deadline across page loads (matches "logged session" behaviour).
+   - A fresh browser session, a new device, or incognito (which has its own
+     ephemeral localStorage) starts a fresh 7-day window.
+   - When the deadline elapses it auto-rolls forward another 7 days so the
+     timer never sits at 00:00:00. */
+const URGENCY_KEY = 'sdp_urgency_deadline_ms';
+function computeUrgencyDeadline(): number {
+  const target = new Date();
+  target.setDate(target.getDate() + 7);
+  target.setHours(23, 59, 59, 999);
+  return target.getTime();
+}
+function readOrCreateDeadline(): number {
+  try {
+    const raw = window.localStorage.getItem(URGENCY_KEY);
+    if (raw) {
+      const ts = parseInt(raw, 10);
+      if (Number.isFinite(ts) && ts > Date.now()) return ts;
+    }
+    const fresh = computeUrgencyDeadline();
+    window.localStorage.setItem(URGENCY_KEY, String(fresh));
+    return fresh;
+  } catch {
+    return computeUrgencyDeadline();
+  }
+}
+
+function UrgencyLine() {
+  const [t, setT] = useState<{ d: number; h: number; m: number; s: number } | null>(null);
+  useEffect(() => {
+    let deadline = readOrCreateDeadline();
+    const tick = () => {
+      let diff = deadline - Date.now();
+      if (diff <= 0) {
+        deadline = computeUrgencyDeadline();
+        try { window.localStorage.setItem(URGENCY_KEY, String(deadline)); } catch {}
+        diff = deadline - Date.now();
+      }
+      setT({
+        d: Math.floor(diff / 86400000),
+        h: Math.floor((diff % 86400000) / 3600000),
+        m: Math.floor((diff % 3600000) / 60000),
+        s: Math.floor((diff % 60000) / 1000),
+      });
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <p className="sdp-urgency" suppressHydrationWarning>
+      <span className="sdp-urgency-label">Offer Ends In</span>
+      <span className="sdp-urgency-timer">
+        <span className="sdp-urgency-unit"><b>{t ? String(t.d).padStart(2, '0') : '00'}</b><span>Days</span></span>
+        <span className="sdp-urgency-sep">:</span>
+        <span className="sdp-urgency-unit"><b>{t ? String(t.h).padStart(2, '0') : '00'}</b><span>Hrs</span></span>
+        <span className="sdp-urgency-sep">:</span>
+        <span className="sdp-urgency-unit"><b>{t ? String(t.m).padStart(2, '0') : '00'}</b><span>Min</span></span>
+        <span className="sdp-urgency-sep">:</span>
+        <span className="sdp-urgency-unit"><b>{t ? String(t.s).padStart(2, '0') : '00'}</b><span>Sec</span></span>
+      </span>
+    </p>
+  );
+}
+
+/* ============================================================
+   Risk reversal strip — rendered below every primary CTA
+   ============================================================ */
+
+function RiskReversalStrip() {
+  return (
+    <div className="sdp-risk-strip" aria-hidden="true">
+      <span className="sdp-risk-badge">
+        <span className="sdp-risk-icon sdp-risk-icon-green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2l8 3v7c0 4.97-3.35 9.26-8 10-4.65-.74-8-5.03-8-10V5l8-3z" />
+            <polyline points="9 12 11 14 15 10" />
+          </svg>
+        </span>
+        100% Money-Back Guarantee
+      </span>
+      <span className="sdp-risk-badge">
+        <span className="sdp-risk-icon sdp-risk-icon-gold">
+          <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinejoin="round">
+            <polygon points="12 2 15 8.5 22 9.3 17 14 18.3 21 12 17.5 5.7 21 7 14 2 9.3 9 8.5 12 2" />
+          </svg>
+        </span>
+        550+ Success Stories
+      </span>
+      <span className="sdp-risk-badge">
+        <span className="sdp-risk-icon sdp-risk-icon-blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+        </span>
+        Trusted by Senior Professionals
+      </span>
     </div>
   );
 }
@@ -286,7 +426,7 @@ function Hero() {
   return (
     <section className="sdp-hero">
       <div className="sdp-wrap sdp-hero-inner">
-        <div className="sdp-callout" data-sdp-reveal>
+        <div className="sdp-callout">
           For High-Performing Professionals 30+ Who Keep Restarting Their Fitness Journey
         </div>
 
@@ -315,7 +455,7 @@ function Hero() {
         </div>
 
         <p className="sdp-above-vsl" data-sdp-reveal style={{ ['--d' as string]: '.20s' }}>
-          Watch the video to see how it works.
+          Watch The Short Video Below <span aria-hidden="true">↓</span>
         </p>
 
         <VSLVideo />
@@ -381,87 +521,6 @@ function Hero() {
             </div>
             <span>15-Min 1:1 Phone Call</span>
           </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ============================================================
-   Section: Amardeep case study
-   ============================================================ */
-
-const AMARDEEP_RESULTS = [
-  { marker: 'Body Weight', day0: '104.1 kg', now: '78 kg' },
-  { marker: 'Waist', day0: '47 inches', now: '35 inches' },
-  { marker: 'HbA1c', day0: '6.2 (pre-diabetic)', now: 'Below 5.7' },
-  { marker: 'Triglycerides', day0: '223', now: 'Below 150' },
-  { marker: 'Pain Medication', day0: 'Occasional', now: 'None' },
-];
-
-function AmardeepCase() {
-  return (
-    <section className="sdp-case sdp-dark">
-      <div className="sdp-wrap">
-        <div className="sdp-case-head">
-          <div className="sdp-eyebrow center" data-sdp-reveal>A Senior Professional Like You</div>
-          <h2 data-sdp-reveal style={{ ['--d' as string]: '.08s' }}>
-            Meet Amardeep. He’d Tried Celebrity Coaches. He’d Restarted Half A Dozen Times.{' '}
-            <em>He Hasn’t Restarted Once In 3 Years.</em>
-          </h2>
-        </div>
-
-        <div className="sdp-case-card" data-sdp-reveal style={{ ['--d' as string]: '.12s' }}>
-          <div className="sdp-case-profile">
-            <div className="sdp-case-avatar">
-              <Image
-                src="/transformation-images/amardeep%20profile.png"
-                alt="Amardeep Singh"
-                width={730}
-                height={737}
-                sizes="(max-width: 768px) 100vw, 640px"
-                priority
-              />
-            </div>
-            <div className="sdp-case-id">
-              <div className="sdp-case-name">AMARDEEP SINGH</div>
-              <div className="sdp-case-meta">
-                <span>General Manager · Marriott Property</span>
-                <span>1 to 2 Week Travel Cycles · Rishikesh ↔ Delhi</span>
-                <span>Prior L5 L6 Spinal Decompression Surgery</span>
-                <span className="pre">Pre-Diabetic When He Started</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="sdp-case-quote">
-            I trained regularly. I had worked with multiple trainers, including celebrity
-            coaches. Either the results didn’t show up, or the plan couldn’t survive my
-            schedule. After enough cycles, the frustration was quiet. I’d stopped expecting
-            it to last.
-          </div>
-
-          <span className="sdp-case-results-label">→ The Results</span>
-          <table className="sdp-case-table">
-            <thead>
-              <tr><th>Marker</th><th>Day 0</th><th>Today</th></tr>
-            </thead>
-            <tbody>
-              {AMARDEEP_RESULTS.map(r => (
-                <tr key={r.marker}>
-                  <td className="m-name">{r.marker}</td>
-                  <td className="d-zero">{r.day0}</td>
-                  <td className="d-now">{r.now}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <p className="sdp-case-closing">
-            <strong>What changed:</strong> he stopped restarting. Three years later he’s
-            still with the same coach. He’s referred 4 clients personally. His wife is now
-            a client.
-          </p>
         </div>
       </div>
     </section>
@@ -1127,7 +1186,7 @@ function FounderAuthority() {
 }
 
 /* ============================================================
-   Section: Mechanism + callout band
+   Section: Mechanism
    ============================================================ */
 
 const MECH_PILLARS = [
@@ -1142,23 +1201,13 @@ function Mechanism() {
     <section className="sdp-mech sdp-light-alt">
       <div className="sdp-wrap">
         <div className="sdp-center-wrap">
-          <div className="sdp-eyebrow center" data-sdp-reveal>The Diagnosis</div>
+          <div className="sdp-eyebrow center" data-sdp-reveal>The Mechanism</div>
         </div>
         <h2 className="sdp-h2" data-sdp-reveal style={{ ['--d' as string]: '.06s' }}>
-          Why Most Fitness Plans <em>Fail When Life Gets Busy.</em>
+          How Our Constraint-Based Fitness Model <em>Works Differently.</em>
         </h2>
 
-        <p className="sdp-mech-body" data-sdp-reveal style={{ ['--d' as string]: '.10s' }}>
-          You already know what to do. Calorie deficit, protein, training. The knowledge
-          isn’t the problem. The problem is that most plans demand perfect conditions and
-          assume stable weeks. Real life doesn’t have stable weeks.{' '}
-          <strong>That’s not a discipline problem. It’s a design problem.</strong>
-        </p>
-
-        <div className="sdp-mech-sub-h" data-sdp-reveal style={{ ['--d' as string]: '.16s' }}>
-          How Our Constraint-Based Fitness Model Works Differently
-        </div>
-        <p className="sdp-mech-sub-body" data-sdp-reveal style={{ ['--d' as string]: '.20s' }}>
+        <p className="sdp-mech-sub-body" data-sdp-reveal style={{ ['--d' as string]: '.10s' }}>
           Engineered around three physiological inputs most fitness plans ignore: cortisol
           response under work stress, decision fatigue, and metabolic variability across
           travel and stable weeks.
@@ -1187,91 +1236,6 @@ function Mechanism() {
   );
 }
 
-function CalloutBand() {
-  return (
-    <div className="sdp-callout-band">
-      <div className="sdp-callout-text" data-sdp-reveal>
-        Most coaches guess. <em>We measure.</em>
-      </div>
-    </div>
-  );
-}
-
-/* ============================================================
-   Section: Health markers
-   ============================================================ */
-
-const WALK_IN_CONDITIONS = [
-  'Pre-diabetic or Type 2 diabetic HbA1c',
-  'Elevated triglycerides and high LDL',
-  'High blood pressure',
-  'Low Vitamin D',
-  'Anemia or low hemoglobin',
-  'Cardiac risk markers',
-  'Liver enzyme elevation (SGPT, SGOT)',
-  'Hormonal imbalances',
-];
-
-const MARKER_ROWS = [
-  { marker: 'HbA1c', client: 'Amardeep · Marriott GM', day0: '6.2', now: '< 5.7' },
-  { marker: 'Triglycerides', client: 'Amardeep', day0: '223', now: '< 150' },
-  { marker: 'LDL Cholesterol', client: 'Vikas', day0: '135', now: '98' },
-  { marker: 'Vitamin D', client: 'Vikas', day0: '15.6 ng/ml', now: '34 ng/ml' },
-  { marker: 'SGPT (liver)', client: 'Vikas', day0: '351', now: '21' },
-];
-
-function HealthMarkers() {
-  return (
-    <section className="sdp-markers sdp-dark">
-      <div className="sdp-wrap">
-        <div className="sdp-center-wrap">
-          <div className="sdp-eyebrow center" data-sdp-reveal>Backed By Bloodwork</div>
-        </div>
-        <h2 className="sdp-h2" data-sdp-reveal style={{ ['--d' as string]: '.06s' }}>
-          Every Blood Marker Will <em>Improve In 90 Days.</em>
-        </h2>
-
-        <p className="sdp-markers-body" data-sdp-reveal style={{ ['--d' as string]: '.10s' }}>
-          We design your plan around what your bloodwork actually shows. HbA1c, lipid panel,
-          liver enzymes, vitamin D, hemoglobin, thyroid.{' '}
-          <strong>
-            Every blood marker we measure on day 0 will have improved by day 90.
-          </strong>{' '}
-          Many normalise completely.
-        </p>
-
-        <div className="sdp-markers-list-wrap" data-sdp-reveal style={{ ['--d' as string]: '.14s' }}>
-          <div className="sdp-markers-list-title">→ This Is The Program Built For Clients Who Walk In With:</div>
-          <ul className="sdp-markers-list">
-            {WALK_IN_CONDITIONS.map(c => <li key={c}>{c}</li>)}
-          </ul>
-        </div>
-
-        <div className="sdp-markers-table-wrap" data-sdp-reveal style={{ ['--d' as string]: '.20s' }}>
-          <div className="sdp-markers-table-title">→ Real Client Marker Improvements</div>
-          <table className="sdp-markers-table">
-            <thead>
-              <tr><th>Marker</th><th>Day 0</th><th>After SDP</th></tr>
-            </thead>
-            <tbody>
-              {MARKER_ROWS.map(r => (
-                <tr key={`${r.marker}-${r.client}`}>
-                  <td>
-                    <span className="m-cell">{r.marker}</span>
-                    <span className="m-client">{r.client}</span>
-                  </td>
-                  <td className="d-zero">{r.day0}</td>
-                  <td className="d-now">{r.now}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 /* ============================================================
    Section: Saket featured
    ============================================================ */
@@ -1285,6 +1249,12 @@ function SaketFeatured() {
   return (
     <section className="sdp-proof sdp-light">
       <div className="sdp-wrap">
+        <div className="sdp-center-wrap">
+          <div className="sdp-eyebrow center" data-sdp-reveal>Featured Client Spotlight</div>
+        </div>
+        <h2 className="sdp-h2" data-sdp-reveal style={{ ['--d' as string]: '.06s' }}>
+          SDP Is The <em>#1 Choice</em> Of Saket Gokhale — One Of India&rsquo;s Most Ambitious &amp; Followed Men.
+        </h2>
         <div className="sdp-saket" data-sdp-reveal>
           <div
             className="sdp-saket-vid"
@@ -1337,6 +1307,15 @@ function SaketFeatured() {
                   </span>
                 </div>
                 <div className="sdp-saket-role">Fitness Influencer, Pune</div>
+                <div className="sdp-saket-followers">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                  <span><b>2.4M</b> followers</span>
+                </div>
                 <div className="sdp-saket-stars" aria-label="5 out of 5 stars">
                   {Array.from({ length: 5 }).map((_, idx) => (
                     <svg key={idx} viewBox="0 0 24 24" fill="currentColor">
@@ -1358,154 +1337,6 @@ function SaketFeatured() {
       </div>
 
       <VideoModal videoUrl={open ? SAKET_VIDEO : null} onClose={() => setOpen(false)} />
-    </section>
-  );
-}
-
-/* ============================================================
-   Section: Comparison matrix
-   ============================================================ */
-
-type Verdict = 'yes' | 'no' | 'partial';
-interface CmpRow {
-  feature: string;
-  icon: ReactNode;
-  online: { verdict: Verdict; label?: string };
-  local: { verdict: Verdict; label?: string };
-}
-
-const NoIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-  </svg>
-);
-
-const YesIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="20 6 9 17 4 12" />
-  </svg>
-);
-
-const StarIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" />
-  </svg>
-);
-
-const CMP_ROWS: CmpRow[] = [
-  {
-    feature: 'Health Markers Tracked & Improved',
-    icon: <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />,
-    online: { verdict: 'no' }, local: { verdict: 'no' },
-  },
-  {
-    feature: 'Quarterly Bloodwork Analysis Included',
-    icon: <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />,
-    online: { verdict: 'no' }, local: { verdict: 'no' },
-  },
-  {
-    feature: 'Plan Adapts To Travel & Stress Weeks',
-    icon: <><circle cx="12" cy="12" r="10" /><path d="M2 12h20" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></>,
-    online: { verdict: 'no' }, local: { verdict: 'no' },
-  },
-  {
-    feature: 'Engineered For Senior Professionals',
-    icon: <><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></>,
-    online: { verdict: 'partial', label: 'Generic' }, local: { verdict: 'no' },
-  },
-  // {
-  //   feature: 'Structured Around Your Worst Week',
-  //   icon: <><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></>,
-  //   online: { verdict: 'no' }, local: { verdict: 'partial', label: 'High-Pay Tier Only' },
-  // },
-  {
-    feature: 'Head Coach Involved In Program Design',
-    icon: <><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></>,
-    online: { verdict: 'no' }, local: { verdict: 'yes' },
-  },
-];
-
-function CmpPill({ verdict, label }: { verdict: Verdict; label?: string }) {
-  if (verdict === 'partial') {
-    return <span className="sdp-cmp-pill is-partial">{label ?? 'Partial'}</span>;
-  }
-  if (verdict === 'yes') {
-    return <span className="sdp-cmp-pill is-yes"><YesIcon /> Yes</span>;
-  }
-  return <span className="sdp-cmp-pill is-no"><NoIcon /> No</span>;
-}
-
-function ComparisonMatrix() {
-  return (
-    <section className="sdp-compare sdp-dark">
-      <div className="sdp-wrap">
-        <div className="sdp-center-wrap">
-          <div className="sdp-eyebrow center" data-sdp-reveal>Comparison</div>
-        </div>
-        <h2 className="sdp-h2" data-sdp-reveal style={{ ['--d' as string]: '.06s' }}>
-          Why SDP Is Not Like <em>Other Fitness Coaching.</em>
-        </h2>
-        <p className="sdp-sub" data-sdp-reveal style={{ ['--d' as string]: '.10s' }}>
-          The structural differences that change outcomes for senior professionals.
-        </p>
-
-        <div className="sdp-cmp" data-sdp-reveal style={{ ['--d' as string]: '.16s' }}>
-          <div className="sdp-cmp-matrix">
-            <div className="sdp-cmp-strip" aria-hidden="true" />
-
-            <div className="sdp-cmp-mhead">
-              <div />
-              <div className="sdp-cmp-mh-prov">
-                <span className="sdp-cmp-mh-ic" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M2 12h20" />
-                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                  </svg>
-                </span>
-                <span className="sdp-cmp-mh-name">Online Coach</span>
-              </div>
-              <div className="sdp-cmp-mh-prov">
-                <span className="sdp-cmp-mh-ic" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                    <circle cx="12" cy="10" r="3" />
-                  </svg>
-                </span>
-                <span className="sdp-cmp-mh-name">Gym Trainer</span>
-              </div>
-              <div className="sdp-cmp-mh-prov is-hero">
-                <span className="sdp-cmp-mh-ic" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 2l8 3v7c0 4.97-3.35 9.26-8 10-4.65-.74-8-5.03-8-10V5l8-3z" />
-                    <polyline points="9 12 11 14 15 10" />
-                  </svg>
-                </span>
-                <span className="sdp-cmp-mh-name">SDP <span className="hero-star" aria-hidden="true"><StarIcon /></span></span>
-              </div>
-            </div>
-
-            {CMP_ROWS.map((row, idx) => (
-              <div key={idx} className="sdp-cmp-mrow">
-                <div className="sdp-cmp-mf">
-                  <span className="sdp-cmp-mf-ic" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      {row.icon}
-                    </svg>
-                  </span>
-                  <span>{row.feature}</span>
-                </div>
-                <div className="sdp-cmp-mc" data-prov="Online Coach"><CmpPill {...row.online} /></div>
-                <div className="sdp-cmp-mc" data-prov="Local Trainer"><CmpPill {...row.local} /></div>
-                <div className="sdp-cmp-mc is-hero">
-                  <span className="sdp-cmp-mc-prov" aria-hidden="true"><StarIcon />SDP</span>
-                  <span className="sdp-cmp-pill is-yes-hero"><YesIcon /> Yes</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
     </section>
   );
 }
@@ -1783,79 +1614,6 @@ function LandingFAQ() {
 }
 
 /* ============================================================
-   Section: Final closer
-   ============================================================ */
-
-const WHAT_LOOKS_LIKE = [
-  'Your clothes fit differently',
-  'You have consistent energy throughout the day',
-  'You stopped negotiating with yourself every Monday morning',
-  'You feel in control of your body the way you feel in control of your career',
-  'Your blood markers moved in the right direction, with documentation',
-  'You finally became someone who trains consistently, not someone who keeps trying',
-];
-
-function FinalCloser() {
-  return (
-    <section className="sdp-final" id="book">
-      <div className="sdp-wrap sdp-final-inner">
-        <div
-          className="sdp-eyebrow center"
-          data-sdp-reveal
-          style={{ color: 'var(--brand-bright, #60A5FA)' }}
-        >
-          The Decision
-        </div>
-        <h2 data-sdp-reveal style={{ ['--d' as string]: '.06s' }}>
-          Ready To Stop <em>Restarting Your Fitness?</em>
-        </h2>
-
-        <p className="sdp-final-body" data-sdp-reveal style={{ ['--d' as string]: '.10s' }}>
-          Picture yourself 90 days from now.
-          <br />
-          <strong>Not perfect. Not a different person.</strong>
-          <br />
-          But someone who got through three months of real life and kept going anyway.
-        </p>
-
-        <div className="sdp-what-looks" data-sdp-reveal style={{ ['--d' as string]: '.16s' }}>
-          <div className="sdp-what-looks-label">What That Looks Like</div>
-          <ul className="sdp-what-looks-list">
-            {WHAT_LOOKS_LIKE.map(item => (
-              <li key={item}>
-                <span className="ck">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                </span>
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <p className="sdp-final-line" data-sdp-reveal style={{ ['--d' as string]: '.22s' }}>
-          That’s what a system built for your life actually produces. And it starts with
-          one conversation.
-        </p>
-
-        <SdpCta delayStyleVar=".28s" />
-
-        <p className="sdp-final-risk" data-sdp-reveal style={{ ['--d' as string]: '.34s' }}>
-          <span className="sdp-final-risk-row">
-            <strong>Worst case:</strong> you get clarity on what’s been holding you back.
-            Refundable if it’s not useful.
-          </span>
-          <span className="sdp-final-risk-row">
-            <strong>Best case:</strong> you finally find a fitness approach that fits your life.
-          </span>
-        </p>
-      </div>
-    </section>
-  );
-}
-
-/* ============================================================
    Section: Footer
    ============================================================ */
 
@@ -1890,41 +1648,50 @@ function LandingFooter() {
    ============================================================ */
 
 function StickyBottomStrip() {
-  const [stuck, setStuck] = useState(false);
   const [href, setHref] = useState('/new-checkout-page');
 
   useEffect(() => {
     captureUtm(new URLSearchParams(window.location.search));
     setHref(decorateHref('/new-checkout-page'));
-
-    const hero = document.querySelector<HTMLElement>('.sdp-hero');
-    if (!hero) return;
-    const update = () => setStuck(hero.getBoundingClientRect().bottom < 0);
-    update();
-    window.addEventListener('scroll', update, { passive: true });
-    return () => window.removeEventListener('scroll', update);
   }, []);
 
   return (
-    <div className={`sdp-stuck${stuck ? ' on' : ''}`} id="sdp-stuck">
+    <div className="sdp-stuck on" id="sdp-stuck">
       <div className="sdp-stuck-inner">
         <div className="sdp-stuck-meta">
           <span className="sdp-stuck-pulse" aria-hidden="true" />
           <div className="sdp-stuck-text">
             <div className="sdp-stuck-h">Ready to <em>stop restarting?</em></div>
-            <div className="sdp-stuck-s">15-Min Phone Call · Refundable · No Pressure</div>
+            <div className="sdp-stuck-s">
+              <span className="sdp-stuck-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M12 2l8 3v7c0 4.97-3.35 9.26-8 10-4.65-.74-8-5.03-8-10V5l8-3z" />
+                  <polyline points="9 12 11 14 15 10" />
+                </svg>
+                <span><b>100%</b> Money-Back Guarantee</span>
+              </span>
+              <span className="sdp-stuck-badge-sep" aria-hidden="true">·</span>
+              <span className="sdp-stuck-badge">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <polygon points="12 2 15 8.5 22 9.3 17 14 18.3 21 12 17.5 5.7 21 7 14 2 9.3 9 8.5 12 2" />
+                </svg>
+                <span><b>550+</b> Success Stories</span>
+              </span>
+            </div>
           </div>
         </div>
         <a href={href} className="sdp-cta">
           <span className="cta-top">
-            <span>Book Pre-Strategy Call • ₹97</span>
+            <span className="sdp-stuck-cta-text">
+              <span>Click Here To Get Your Personalised Diagnosis</span>
+              <span className="sdp-stuck-cta-tail"> + Fitness Roadmap</span>
+            </span>
             <span className="arrow">
               <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12h14M13 5l7 7-7 7" />
               </svg>
             </span>
           </span>
-          <span className="cta-sub">15-Min Phone Call • Refundable • No Pressure</span>
         </a>
       </div>
     </div>
@@ -1940,22 +1707,18 @@ export default function LandingPage() {
 
   return (
     <div className="sdp-root">
-      <AnnounceBar />
+      <TrustBanner />
+      <TrustStrip />
       <SiteHeader />
       <Hero />
-      <AmardeepCase />
       <WhoThisIsFor />
+      <SaketFeatured />
       <ProofSection />
       <FounderAuthority />
       <Mechanism />
-      <CalloutBand />
-      <HealthMarkers />
-      <SaketFeatured />
-      <ComparisonMatrix />
       <Programme />
       <Guarantee />
       <LandingFAQ />
-      <FinalCloser />
       <LandingFooter />
       <StickyBottomStrip />
     </div>
