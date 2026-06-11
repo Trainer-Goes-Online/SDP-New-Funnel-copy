@@ -357,8 +357,20 @@ function VSLVideo() {
       { rootMargin: '300px' }
     );
     io.observe(host);
+    // External trigger from the "Watch The Short Video Below" button: play
+    // unmuted and request fullscreen. Dispatched synchronously inside the
+    // button's click handler so the user-gesture context is preserved.
+    const onExternalPlay = () => {
+      const player = ensurePlayer();
+      if (!player) return;
+      player.setVolume(1).catch(() => {});
+      player.play().then(() => setPlaying(true)).catch(() => setPlaying(true));
+      player.requestFullscreen().catch(() => {});
+    };
+    window.addEventListener('sdp:play-vsl-fullscreen', onExternalPlay);
     return () => {
       io.disconnect();
+      window.removeEventListener('sdp:play-vsl-fullscreen', onExternalPlay);
       playerRef.current?.destroy().catch(() => {});
       playerRef.current = null;
     };
@@ -454,9 +466,20 @@ function Hero() {
           ))}
         </div>
 
-        <p className="sdp-above-vsl" data-sdp-reveal style={{ ['--d' as string]: '.20s' }}>
+        <button
+          type="button"
+          className="sdp-above-vsl"
+          data-sdp-reveal
+          style={{ ['--d' as string]: '.20s' }}
+          onClick={() => {
+            document
+              .getElementById('sdp-vsl')
+              ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            window.dispatchEvent(new Event('sdp:play-vsl-fullscreen'));
+          }}
+        >
           Watch The Short Video Below <span aria-hidden="true">↓</span>
-        </p>
+        </button>
 
         <VSLVideo />
 

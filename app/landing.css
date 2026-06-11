@@ -448,6 +448,21 @@
   border:1px solid rgba(59,130,246,.28)!important;
   padding:7px 16px!important;
   border-radius:999px!important;
+  cursor:pointer!important;
+  transition:background .18s ease, transform .18s ease!important;
+}
+.sdp-root button.sdp-above-vsl{
+  appearance:none!important; -webkit-appearance:none!important;
+  line-height:1.2!important;
+  font:inherit; /* allow the !important rules above to win cleanly */
+}
+.sdp-root .sdp-above-vsl:hover{
+  background:rgba(59,130,246,.2)!important;
+  transform:translateY(-1px)!important;
+}
+.sdp-root .sdp-above-vsl:focus-visible{
+  outline:2px solid var(--brand-deep,#1E40AF)!important;
+  outline-offset:2px!important;
 }
 
 /* Hero blood-marker chips */
