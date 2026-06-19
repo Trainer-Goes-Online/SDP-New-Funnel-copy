@@ -145,8 +145,17 @@ export async function POST(req: NextRequest) {
       req.headers.get('x-real-ip') ??
       undefined;
     const clientUserAgent = req.headers.get('user-agent') ?? undefined;
-    const resolvedEventSourceUrl =
-      eventSourceUrl ?? 'https://sdp.sciencedrivenperformance.in/new-checkout-page';
+    // Strip query string from event_source_url before it reaches the Sheet
+    // or Meta. UTMs are already captured as their own fields; keeping the
+    // bare URL keeps the row readable and lets `event_source_url` double as
+    // a clean funnel identifier (domain = funnel) for multi-funnel A/B tests.
+    const stripQuery = (url: string) => {
+      try { const u = new URL(url); return `${u.origin}${u.pathname}`; }
+      catch { return url; }
+    };
+    const resolvedEventSourceUrl = stripQuery(
+      eventSourceUrl ?? 'https://sdp.sciencedrivenperformance.in/new-checkout-page'
+    );
     const externalIdHash = customer.email
       ? crypto
           .createHash('sha256')
