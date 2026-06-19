@@ -1,8 +1,9 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useScrollReveal } from '@/components/shared/useScrollReveal';
 import { useConversionPush } from '@/components/shared/useConversionPush';
+import { reapplyMamFromCookie } from '@/lib/analytics';
 
 const TY_VIDEO_URL =
   'https://tgox-production-bucket.nyc3.cdn.digitaloceanspaces.com/client_funnel_videos/SDP/sdp_thank_you_final_video_02.mp4_v1%20(1080p).mp4';
@@ -414,6 +415,11 @@ function Footer() {
 export default function ThankYouPage() {
   useScrollReveal();
   useConversionPush();
+
+  // Safety net: re-apply persisted Advanced Matching on mount.
+  useEffect(() => {
+    reapplyMamFromCookie();
+  }, []);
 
   return (
     <>

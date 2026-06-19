@@ -58,6 +58,15 @@ t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
 fbq('init', '${process.env.NEXT_PUBLIC_META_PIXEL_ID}');
+try {
+  var m = document.cookie.match(/(?:^|;\\s*)sdp_mam=([^;]+)/);
+  if (m) {
+    var mam = JSON.parse(decodeURIComponent(m[1]));
+    if (mam && typeof mam === 'object' && Object.keys(mam).length) {
+      fbq('init', '${process.env.NEXT_PUBLIC_META_PIXEL_ID}', mam);
+    }
+  }
+} catch (e) {}
 fbq('track', 'PageView');`}
                 </Script>
                 <noscript>

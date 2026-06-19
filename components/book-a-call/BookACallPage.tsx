@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useScrollReveal } from '@/components/shared/useScrollReveal';
+import { reapplyMamFromCookie } from '@/lib/analytics';
 
 /* ============================================================
    Helpers
@@ -872,6 +873,12 @@ function StickyStrip() {
 
 export default function BookACallPage() {
   useScrollReveal();
+
+  // Post-payment landing: re-apply persisted Advanced Matching so this
+  // PageView ties to the buyer (belt-and-braces with the inline pixel script).
+  useEffect(() => {
+    reapplyMamFromCookie();
+  }, []);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {

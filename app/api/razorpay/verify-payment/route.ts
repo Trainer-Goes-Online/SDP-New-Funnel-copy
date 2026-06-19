@@ -49,10 +49,14 @@ async function sendMetaCapiEvent(params: {
       ...(params.clientUserAgent && { client_user_agent: params.clientUserAgent }),
       ...(params.clientIp        && { client_ip_address: params.clientIp }),
     },
+    // Health & Wellness restriction: keep custom_data scrubbed to value +
+    // currency only. payment_id is already carried as event_id above (dedup
+    // key), so it's redundant here — and a leaner payload gives Meta nothing
+    // extra to scan as "sensitive". No content_name / product / condition
+    // strings ever go to Meta.
     custom_data: {
       currency: 'INR',
       value: Number(process.env.NEXT_PUBLIC_PRICE_INR ?? '97'),
-      payment_id: params.paymentId,
     },
   };
 
@@ -156,6 +160,15 @@ export async function POST(req: NextRequest) {
     const resolvedEventSourceUrl = stripQuery(
       eventSourceUrl ?? 'https://sdp2.sciencedrivenperformance.in/new-checkout-page'
     );
+    // Meta gets the ORIGIN only (no path/query). Under the Health & Wellness
+    // "core setup" tier Meta strips the path anyway; sending host-only avoids
+    // leaking any path/UTM signal and matches the corrective SOP. The Pabbly /
+    // Sheet payload keeps `resolvedEventSourceUrl` (origin + path) because the
+    // path doubles as a funnel identifier there — only the Meta fire is reduced.
+    const metaEventSourceUrl = (() => {
+      try { return new URL(resolvedEventSourceUrl).origin; }
+      catch { return 'https://sdp2.sciencedrivenperformance.in'; }
+    })();
     const externalIdHash = customer.email
       ? crypto
           .createHash('sha256')
@@ -241,13 +254,19 @@ export async function POST(req: NextRequest) {
         lastName: customer.lastName,
         city: customer.city,
         country: customer.countryCode,
-        eventSourceUrl: resolvedEventSourceUrl,
+        eventSourceUrl: metaEventSourceUrl,
         fbc,
         fbp,
         clientIp,
         clientUserAgent,
       };
-      const eventNames = ['SDPPurchase', 'Purchase'];
+      // Health & Wellness restriction: fire the CUSTOM event ONLY. The standard
+      // `Purchase` is blocked by name for this dataset, so it's dropped — ad
+      // sets optimize directly on `SDPPurchase`. Do NOT re-add `Purchase` here
+      // (it re-triggers the restriction). If Meta ever scans/degrades the custom
+      // event (roadmap Scenario C), recode the name (e.g. `evt_a`) — don't fall
+      // back to a standard event.
+      const eventNames = ['SDPPurchase'];
       const results = await Promise.allSettled(
         eventNames.map((eventName) =>
           sendMetaCapiEvent({ eventName, ...sharedPayload })

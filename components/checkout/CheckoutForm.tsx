@@ -322,6 +322,35 @@ export default function CheckoutForm() {
     }
   }, [showToast]);
 
+  // Fire Advanced Matching as soon as the form is fully filled + valid —
+  // independent of whether the user pays. This identifies any subsequent pixel
+  // events AND persists hashed identity to the sdp_mam cookie, so a later return
+  // visit's PageView still ships with full identity (high EMQ). Debounced 500ms
+  // so we don't re-init on every keystroke. PII is hashed client-side in
+  // setMetaAdvancedMatching before anything leaves the browser.
+  useEffect(() => {
+    const allFilled =
+      fields.firstName.trim() &&
+      fields.lastName.trim() &&
+      fields.email.trim() &&
+      fields.city.trim() &&
+      fields.phone.trim();
+    if (!allFilled) return;
+    if (Object.keys(validateFields(fields, countryCode)).length > 0) return;
+    const selected = COUNTRIES.find((c) => c.code === countryCode) ?? COUNTRIES[0];
+    const timer = setTimeout(() => {
+      void setMetaAdvancedMatching({
+        email:     fields.email,
+        phone:     `${selected.dial}${fields.phone}`,
+        firstName: fields.firstName,
+        lastName:  fields.lastName,
+        city:      fields.city,
+        country:   countryCode,
+      });
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [fields, countryCode]);
+
   function handleApplyCoupon() {
     setCouponError(null);
     const code = couponInput.trim().toUpperCase();
@@ -493,7 +522,9 @@ export default function CheckoutForm() {
       if (utm.content)  tyParams.set('utm_content',  utm.content);
       if (utm.term)     tyParams.set('utm_term',     utm.term);
 
-      setMetaAdvancedMatching({
+      // Refresh MAM with the final values and persist the cookie BEFORE
+      // navigating, so the /new-book-a-call PageView inherits identity.
+      await setMetaAdvancedMatching({
         email:     fields.email,
         phone:     `${dialCode}${fields.phone}`,
         firstName: fields.firstName,
