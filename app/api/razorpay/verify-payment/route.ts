@@ -154,7 +154,7 @@ export async function POST(req: NextRequest) {
       catch { return url; }
     };
     const resolvedEventSourceUrl = stripQuery(
-      eventSourceUrl ?? 'https://sdp.sciencedrivenperformance.in/new-checkout-page'
+      eventSourceUrl ?? 'https://sdp2.sciencedrivenperformance.in/new-checkout-page'
     );
     const externalIdHash = customer.email
       ? crypto

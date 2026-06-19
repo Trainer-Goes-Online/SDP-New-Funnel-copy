@@ -19,7 +19,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://sdp.sciencedrivenperformance.in'),
+  metadataBase: new URL('https://sdp2.sciencedrivenperformance.in'),
   title: {
     default: 'Science Driven Performance',
     template: '%s',
