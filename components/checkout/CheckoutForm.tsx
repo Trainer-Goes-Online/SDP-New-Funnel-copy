@@ -137,7 +137,7 @@ function CountryDropdown({
    ============================================================ */
 
 const VALUE_BULLETS = [
-  '15-minute 1:1 call with the SDP coaching team',
+  'Personalised diagnosis & fitness roadmap',
   'Honest fit check — we tell you if SDP isn’t right for you',
   'Walk-through of the 90-Day System + 10% body-weight guarantee',
 ];
@@ -157,7 +157,7 @@ function MobileSummary({ finalINR }: { finalINR: number }) {
       <div className={`checkout-summary-expand${open ? ' open' : ''}`}>
         <div className="checkout-summary-expand-inner">
           <div className="checkout-event-pill">
-            15-Min 1:1 Phone Consultation · Refundable
+            1:1 Consultation · Refundable
           </div>
           <div className="checkout-divider" />
           <div className="checkout-value-stack">
@@ -208,7 +208,7 @@ function OrderSummary({
     <aside className="checkout-summary" aria-label="Order summary">
       <p className="checkout-summary-label">ORDER SUMMARY</p>
       <h2 className="checkout-product-name">SDP Pre-Strategy Call</h2>
-      <div className="checkout-event-pill">15-Min 1:1 Phone Consultation · Refundable</div>
+      <div className="checkout-event-pill">1:1 Consultation · Refundable</div>
 
       <div className="checkout-divider" />
 
