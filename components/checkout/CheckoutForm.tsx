@@ -444,7 +444,7 @@ export default function CheckoutForm() {
         currency:    'INR',
         order_id:    orderId,
         name:        'Science Driven Performance',
-        description: 'SDP Pre-Strategy Call · 15-Min 1:1 Consultation · Refundable',
+        description: 'SDP Pre-Strategy Call · 1:1 Consultation Call · Refundable',
         prefill: {
           name:    `${fields.firstName.trim()} ${fields.lastName.trim()}`,
           email:   fields.email.trim(),

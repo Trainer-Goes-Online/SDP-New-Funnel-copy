@@ -42,7 +42,7 @@ function AnnounceMarquee() {
           <span key={loop} className="announce-loop">
             <span>Payment Confirmed</span>
             <span className="dot" />
-            <span><b>15-Min</b> 1:1 Phone Call</span>
+            <span>1:1 Consultation Call</span>
             <span className="dot" />
             <span>Refundable • No Pressure</span>
             <span className="dot" />
@@ -85,7 +85,7 @@ function Hero() {
 
         <p className="hero-sub" data-reveal style={{ ['--d' as string]: '.10s' }}>
           Your <strong>₹97 session</strong> is paid.{' '}
-          <mark>Pick a 15-minute phone call window</mark> below.
+          <mark>Pick a 1:1 consultation call window</mark> below.
         </p>
 
         <div className="steps" data-reveal style={{ ['--d' as string]: '.14s' }}>
@@ -310,7 +310,7 @@ function IncludedSection() {
           A Real Diagnostic. <em>Not A Pitch.</em>
         </h2>
         <p className="sub" data-reveal style={{ ['--d' as string]: '.10s' }}>
-          A 15-minute phone call. We assess your situation honestly. You decide what happens next.
+          A 1:1 consultation call. We assess your situation honestly. You decide what happens next.
         </p>
 
         <div className="value-grid">
@@ -380,7 +380,7 @@ function WhyCard() {
             </div>
             <div className="why-stat">
               <div className="n">100%</div>
-              <div className="l">1:1 Phone Calls</div>
+              <div className="l">1:1 Consultation Calls</div>
             </div>
           </div>
 
@@ -668,7 +668,7 @@ const FAQ_ITEMS: { question: string; answer: ReactNode }[] = [
     question: 'Is this a sales call in disguise?',
     answer: (
       <>
-        No. The 15 minutes are diagnostic. We look at your situation, your previous
+        No. The call is diagnostic. We look at your situation, your previous
         restarts, your week, and your bloodwork if you have it.{' '}
         <strong>
           If we’re a fit, we’ll walk you through what working together looks like at the
@@ -696,7 +696,7 @@ const FAQ_ITEMS: { question: string; answer: ReactNode }[] = [
         afterwards, the program investment is a separate conversation, with time to think
         it through.{' '}
         <strong>
-          You will not be asked to commit to anything financially during the 15 minutes.
+          You will not be asked to commit to anything financially during the call.
         </strong>
       </>
     ),
@@ -851,7 +851,7 @@ function StickyStrip() {
           <span className="stuck-pulse" aria-hidden="true" />
           <div className="stuck-text">
             <div className="stuck-h"><em>One last step</em> — pick your slot</div>
-            <div className="stuck-s">15-Min Phone Call · Refundable · No Pressure</div>
+            <div className="stuck-s">1:1 Consultation Call · Refundable · No Pressure</div>
           </div>
         </div>
         <a href="#calendar" className="btn">
