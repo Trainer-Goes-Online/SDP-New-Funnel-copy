@@ -97,7 +97,7 @@ function AnnounceMarquee() {
             <span className="dot" />
             <span>Calendar Invite In <b>5 Minutes</b></span>
             <span className="dot" />
-            <span><b>15-Min</b> 1:1 Phone Call</span>
+            <span>1:1 Consultation Call</span>
             <span className="dot" />
             <span>Refundable • No Pressure</span>
             <span className="dot" />
@@ -143,7 +143,7 @@ function Hero() {
           </span>
           <div className="booking-card-meta">
             <div className="booking-card-label">Your Session</div>
-            <div className="booking-card-value">15-Minute 1:1 Phone Call</div>
+            <div className="booking-card-value">1:1 Consultation Call</div>
           </div>
         </div>
 
@@ -197,7 +197,7 @@ const TIMELINE = [
   },
   {
     num: '04',
-    title: '15-Minute Phone Conversation',
+    title: '1:1 Consultation Call',
     body: (
       <>
         <strong>No script. No pressure.</strong> A real conversation about whether SDP

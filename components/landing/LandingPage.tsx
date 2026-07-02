@@ -511,7 +511,7 @@ function Hero() {
                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
               </svg>
             </div>
-            <span>15-Min 1:1 Phone Call</span>
+            <span>1:1 Consultation Call</span>
           </div>
         </div>
       </div>
@@ -1534,7 +1534,7 @@ const FAQ_ITEMS = [
   {
     question: 'I’m not sure I’m ready right now. Should I wait?',
     answer:
-      'Wait until life is “less busy” and you’ll wait forever, because life doesn’t get less busy. The pre-strategy call is a 15-minute phone conversation, no pressure to sign up. Either you find clarity that we’re not the right fit yet, or you find clarity that this is the right system to start now.',
+      'Wait until life is “less busy” and you’ll wait forever, because life doesn’t get less busy. The pre-strategy call is a 1:1 consultation call, no pressure to sign up. Either you find clarity that we’re not the right fit yet, or you find clarity that this is the right system to start now.',
   },
   {
     question: 'I have an injury. Can I still do this?',

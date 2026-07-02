@@ -4,7 +4,7 @@ import './checkout.css';
 
 export const metadata: Metadata = {
   title: 'Secure Checkout · Science Driven Performance',
-  description: 'Refundable pre-strategy call. 15 minutes with the SDP coaching team.',
+  description: 'Refundable pre-strategy call with the SDP coaching team.',
 };
 
 export default function NewCheckoutPage() {
